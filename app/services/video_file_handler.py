@@ -2,21 +2,24 @@ import cv2
 import time
 
 
-class WebcamHandler:
+class VideoFileHandler:
 
-    def __init__(self):
+    def __init__(self, video_path):
+        self.video_path = video_path
         self.cap = None
         self.retry_limit = 3
         self.retry_delay_seconds = 0.2
 
-    def initialize_camera(self):
+    def initialize_video(self):
 
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(self.video_path)
 
         if not self.cap.isOpened():
-            raise Exception("Unable to access webcam")
+            raise Exception(
+                f"Unable to open video file: {self.video_path}"
+            )
 
-        print("Webcam initialized successfully.")
+        print("Video file initialized successfully.")
 
     def read_frame(self):
 
@@ -46,4 +49,4 @@ class WebcamHandler:
 
         cv2.destroyAllWindows()
 
-        print("Webcam resources released.")
+        print("Video resources released.")
