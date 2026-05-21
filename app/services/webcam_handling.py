@@ -27,6 +27,7 @@ class WebcamHandler:
             success, frame = self.cap.read()
 
             if success:
+                frame = cv2.flip(frame, 1)
                 return success, frame
 
             retry_count += 1
