@@ -6,13 +6,16 @@ video-fraud-detection/
 ├── .gitignore
 ├── app/
 │   ├── detectors/
+│   │   └── face_detector.py
 │   ├── main.py
 │   ├── services/
 │   │   ├── stream_manager.py
 │   │   ├── video_file_handler.py
 │   │   └── webcam_handling.py
 │   └── utils/
-│       └── fps.py
+│       ├── drawings.py
+│       ├── fps.py
+│       └── preprocessing.py
 ├── data/
 ├── log/
 ├── outputs/
