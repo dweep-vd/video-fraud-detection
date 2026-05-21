@@ -8,8 +8,11 @@ video-fraud-detection/
 │   ├── detectors/
 │   ├── main.py
 │   ├── services/
+│   │   ├── stream_manager.py
+│   │   ├── video_file_handler.py
 │   │   └── webcam_handling.py
 │   └── utils/
+│       └── fps.py
 ├── data/
 ├── log/
 ├── outputs/

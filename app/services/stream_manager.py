@@ -1,6 +1,7 @@
 import cv2
 
 from utils.fps import FPSCounter
+from utils.drawings import draw_fps, draw_resolution
 
 
 class StreamManager:
@@ -26,15 +27,8 @@ class StreamManager:
 
             fps = self.fps_counter.get_fps()
 
-            cv2.putText(
-                frame,
-                f"FPS: {fps}",
-                (20, 40),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 255, 0),
-                2,
-            )
+            draw_fps(frame, fps)
+            draw_resolution(frame)
 
             cv2.imshow(
                 "AI Fraud Detection System",
