@@ -20,3 +20,16 @@ class FaceDetector:
         )
 
         return faces
+
+    def draw_face_count(frame, face_count):
+
+        cv2.putText(
+            frame,
+            f"Faces: {face_count}",
+            (20, 120),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+        (0, 0, 255),
+        2,
+    )
+    

@@ -1,7 +1,7 @@
 import cv2
 
 from utils.fps import FPSCounter
-from utils.drawings import draw_fps, draw_resolution
+from utils.drawings import draw_fps, draw_resolution, draw_face_detections, draw_face_count
 from utils.preprocessing import resize_frame,convert_to_grayscale,apply_gaussian_blur
 from detectors.face_detector import FaceDetector
 
@@ -35,11 +35,33 @@ class StreamManager:
             draw_fps(frame, fps)
             draw_resolution(frame)
 
-            cv2.imshow("AI Fraud Detection System",frame)
-            # cv2.imshow("Blurred gray Frame", blurred_gray_frame)
-            
-            detection_results = self.face_detector.detect_faces(blurred_gray_frame)
-            print(detection_results)
+            detection_results = self.face_detector.detect_faces(gray_frame)
+            draw_face_detections(frame, detection_results)
+            face_count = len(detection_results)
+            draw_face_count(frame, face_count)
+
+            if face_count > 1:
+                cv2.putText(
+                    frame,
+                    "ALERT: MULTIPLE FACES DETECTED",
+                    (20, 170),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 0, 255),
+                    3,
+                )
+            if face_count == 0:
+                cv2.putText(
+                    frame,
+                    "ALERT: NO FACE DETECTED",
+                    (20, 220),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 0, 255),
+                    3,
+                )
+
+            cv2.imshow("AI Fraud Detection System", frame)
 
             if cv2.waitKey(1) == ord('q'):
                 print("Exit requested by user.")
