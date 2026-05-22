@@ -53,3 +53,15 @@ def draw_face_count(frame, face_count):
         (0, 0, 255),
         2,
     )
+
+def draw_absence_timer(frame, duration):
+
+    cv2.putText(
+        frame,
+        f"Absence Time: {duration:.1f}s",
+        (20, 260),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
+        (0, 255, 255),
+        2,
+    )
