@@ -65,3 +65,28 @@ def draw_absence_timer(frame, duration):
         (0, 255, 255),
         2,
     )
+
+
+def draw_phone_detections(frame, detections):
+
+    for (x1, y1, x2, y2, confidence) in detections:
+
+        cv2.rectangle(
+            frame,
+            (x1, y1),
+            (x2, y2),
+            (0, 0, 255),
+            2,
+        )
+
+        label = f"Phone {confidence:.0%}"
+
+        cv2.putText(
+            frame,
+            label,
+            (x1, y1 - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (0, 0, 255),
+            2,
+        )

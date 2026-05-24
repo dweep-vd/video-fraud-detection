@@ -9,11 +9,23 @@ class FraudEngine:
 
         self.absence_threshold_seconds = 2.5
 
-    def analyze(self, face_count):
+    def analyze(
+        self,
+        face_count,
+        phone_detected=False,
+    ):
 
         fraud_events = []
 
         current_time = time.time()
+
+        # PHONE DETECTION
+
+        if phone_detected:
+
+            fraud_events.append(
+                "PHONE DETECTED"
+            )
 
         # MULTIPLE FACE DETECTION
 

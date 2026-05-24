@@ -1,1 +1,4 @@
-# Add Python dependencies here
+opencv-python
+ultralytics
+flask
+numpy

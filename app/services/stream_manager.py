@@ -2,9 +2,13 @@ import cv2
 import time
 from utils.fps import FPSCounter
 from utils.drawings import draw_fps, draw_resolution, draw_face_detections, draw_face_count, draw_absence_timer
+from utils.drawings import draw_phone_detections
 from utils.preprocessing import resize_frame, convert_to_grayscale, apply_gaussian_blur
 from detectors.face_detector import FaceDetector
+from detectors.phone_detector import PhoneDetector
 from services.fraud_engine import FraudEngine
+from services.fraud_logger import FraudLogger
+
 
 class StreamManager:
 
@@ -13,7 +17,9 @@ class StreamManager:
         self.source_handler = source_handler
         self.fps_counter = FPSCounter()
         self.face_detector = FaceDetector()
+        self.phone_detector = PhoneDetector()
         self.fraud_engine = FraudEngine()
+        self.fraud_logger = FraudLogger()
 
     def start_stream(self):
 
@@ -35,17 +41,40 @@ class StreamManager:
             draw_fps(frame, fps)
             draw_resolution(frame)
 
+            # FACE DETECTION
+
             detection_results = self.face_detector.detect_faces(blurred_gray_frame)
             draw_face_detections(frame, detection_results)
             face_count = len(detection_results)
             draw_face_count(frame, face_count)
 
-            fraud_events = self.fraud_engine.analyze(face_count)
+            # PHONE DETECTION
+
+            phone_detections = self.phone_detector.detect_phones(
+                frame
+            )
+
+            phone_detected = len(phone_detections) > 0
+
+            draw_phone_detections(frame, phone_detections)
+
+            # FRAUD ANALYSIS
+
+            fraud_events = self.fraud_engine.analyze(
+                face_count,
+                phone_detected=phone_detected,
+            )
 
             # Draw absence timer when no face is present
             if face_count == 0 and self.fraud_engine.no_face_start_time is not None:
                 absence_duration = time.time() - self.fraud_engine.no_face_start_time
                 draw_absence_timer(frame, absence_duration)
+
+            # LOG FRAUD EVENTS
+
+            for event in fraud_events:
+
+                self.fraud_logger.log_event(event)
 
             # Overlay alerts for each fraud event
             alert_y = 170
@@ -70,4 +99,7 @@ class StreamManager:
         self.shutdown()
 
     def shutdown(self):
+
+        self.fraud_logger.save_to_file()
+
         self.source_handler.cleanup()
