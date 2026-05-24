@@ -27,28 +27,35 @@ class FraudLogger:
 
         self.session_start_time = time.time()
 
-        self.logged_events = set()
-
         print("Fraud logger initialized.")
 
-    def log_event(self, event_type):
+    def log_event(
+        self, event_type, start_time, end_time
+    ):
+        """Log a completed fraud event with its
+        time range.
 
-        current_time = time.time()
+        Args:
+            event_type: e.g. "MULTIPLE FACES DETECTED"
+            start_time: elapsed seconds from session start
+            end_time: elapsed seconds from session start
+        """
 
-        elapsed = round(
-            current_time - self.session_start_time,
-            2
-        )
+        duration = round(end_time - start_time, 2)
 
         event_entry = {
-            "timestamp": elapsed,
             "event": event_type,
+            "start_time": start_time,
+            "end_time": end_time,
+            "duration": duration,
         }
 
         self.events.append(event_entry)
 
         print(
-            f"[FRAUD LOG] {elapsed}s - {event_type}"
+            f"[FRAUD LOG] {event_type} "
+            f"{start_time}s - {end_time}s "
+            f"(duration: {duration}s)"
         )
 
     def get_events(self):
@@ -59,36 +66,51 @@ class FraudLogger:
 
         session_duration = round(
             time.time() - self.session_start_time,
-            2
+            2,
         )
 
         event_counts = {}
+        total_durations = {}
 
         for event in self.events:
 
             event_type = event["event"]
 
             if event_type in event_counts:
-
                 event_counts[event_type] += 1
-
+                total_durations[event_type] += event[
+                    "duration"
+                ]
             else:
-
                 event_counts[event_type] = 1
+                total_durations[event_type] = event[
+                    "duration"
+                ]
+
+        # Round total durations
+        for key in total_durations:
+            total_durations[key] = round(
+                total_durations[key], 2
+            )
 
         summary = {
             "session_duration_seconds": session_duration,
             "total_events": len(self.events),
             "event_counts": event_counts,
+            "total_durations": total_durations,
         }
 
         return summary
 
-    def save_to_file(self, filepath=DEFAULT_LOG_PATH):
+    def save_to_file(
+        self, filepath=DEFAULT_LOG_PATH
+    ):
 
         directory = os.path.dirname(filepath)
 
-        if directory and not os.path.exists(directory):
+        if directory and not os.path.exists(
+            directory
+        ):
 
             os.makedirs(directory)
 
@@ -101,6 +123,4 @@ class FraudLogger:
 
             json.dump(data, file, indent=4)
 
-        print(
-            f"Fraud log saved to {filepath}"
-        )
+        print(f"Fraud log saved to {filepath}")

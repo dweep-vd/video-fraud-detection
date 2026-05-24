@@ -145,6 +145,21 @@
 
     {% else %}
 
+    {% if error_msg %}
+    <div class="status-card" style="border-color: #e94560;">
+        <div class="status-icon">❌</div>
+        <h1 style="color: #e94560;">Detection Failed</h1>
+        <p>
+            The detection process crashed. Error details:
+        </p>
+        <pre style="background-color: #0f3460; border-radius: 8px; padding: 15px; margin: 15px 0; color: #ff6b6b; font-size: 0.85em; text-align: left; overflow-x: auto; white-space: pre-wrap; word-break: break-word;">{{ error_msg }}</pre>
+        <div style="margin-top: 20px;">
+            <a href="/" class="btn btn-primary">
+                Back to Home
+            </a>
+        </div>
+    </div>
+    {% else %}
     <div class="status-card done">
         <div class="status-icon">✅</div>
         <h1>Detection Complete</h1>
@@ -161,6 +176,7 @@
             </a>
         </div>
     </div>
+    {% endif %}
 
     {% endif %}
 

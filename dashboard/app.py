@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import subprocess
+import platform
 from flask import Flask, render_template, jsonify
 from flask import request, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -132,9 +133,28 @@ def start_detection():
 
     print(f"Starting detection: {command}")
 
+    # On Windows, use CREATE_NEW_CONSOLE so the OpenCV
+    # GUI window (cv2.imshow) can render properly.
+    popen_kwargs = {"cwd": APP_FOLDER}
+
+    # Capture stderr to a log file for crash diagnostics
+    error_log_path = os.path.join(
+        PROJECT_ROOT, "log", "detection_error.log"
+    )
+    os.makedirs(
+        os.path.dirname(error_log_path), exist_ok=True
+    )
+    error_log_file = open(error_log_path, "w")
+    popen_kwargs["stderr"] = error_log_file
+
+    if platform.system() == "Windows":
+        popen_kwargs["creationflags"] = (
+            subprocess.CREATE_NEW_CONSOLE
+        )
+
     detection_process = subprocess.Popen(
         command,
-        cwd=APP_FOLDER,
+        **popen_kwargs,
     )
 
     return redirect(url_for("running"))
@@ -185,9 +205,22 @@ def running():
 
     running = is_detection_running()
 
+    # If process ended, check for crash errors
+    error_msg = None
+    if not running:
+        error_log_path = os.path.join(
+            PROJECT_ROOT, "log", "detection_error.log"
+        )
+        if os.path.exists(error_log_path):
+            with open(error_log_path, "r") as f:
+                content = f.read().strip()
+            if content:
+                error_msg = content
+
     return render_template(
         "running.html",
         running=running,
+        error_msg=error_msg,
     )
 
 
@@ -231,12 +264,29 @@ def api_events():
 
 if __name__ == "__main__":
 
+    import logging
+    import click
+
+    # Suppress all Flask/Werkzeug startup messages
+    # (Debug mode, Serving Flask app, WARNING, etc.)
+    log = logging.getLogger("werkzeug")
+    log.setLevel(logging.ERROR)
+
+    def secho(text, **kwargs):
+        pass
+
+    def echo(text, **kwargs):
+        pass
+
+    click.echo = echo
+    click.secho = secho
+
     print("=" * 50)
     print("  Fraud Detection Dashboard")
     print("  Open http://localhost:5000")
     print("=" * 50)
 
     app.run(
-        debug=True,
+        debug=False,
         port=5000,
     )

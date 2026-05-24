@@ -1,0 +1,28 @@
+{
+    "summary": {
+        "session_duration_seconds": 77.38,
+        "total_events": 2,
+        "event_counts": {
+            "MULTIPLE FACES DETECTED": 1,
+            "CANDIDATE ABSENT": 1
+        },
+        "total_durations": {
+            "MULTIPLE FACES DETECTED": 4.69,
+            "CANDIDATE ABSENT": 7.1
+        }
+    },
+    "events": [
+        {
+            "event": "MULTIPLE FACES DETECTED",
+            "start_time": 3.4,
+            "end_time": 8.09,
+            "duration": 4.69
+        },
+        {
+            "event": "CANDIDATE ABSENT",
+            "start_time": 62.84,
+            "end_time": 69.94,
+            "duration": 7.1
+        }
+    ]
+}
