@@ -2,8 +2,6 @@
 
 ```
 video-fraud-detection/
-├── .git/
-├── .gitignore
 ├── app/
 │   ├── detectors/
 │   │   ├── face_detector.py
@@ -15,19 +13,20 @@ video-fraud-detection/
 │   │   ├── stream_manager.py
 │   │   ├── video_file_handler.py
 │   │   └── webcam_handling.py
-│   └── utils/
-│       ├── drawings.py
-│       ├── fps.py
-│       └── preprocessing.py
+│   ├── utils/
+│   │   ├── drawings.py
+│   │   ├── fps.py
+│   │   └── preprocessing.py
+│   └── yolov8n.pt
 ├── dashboard/
 │   ├── app.py
 │   └── templates/
-│       └── index.html
+│       ├── index.html
+│       ├── results.html
+│       └── running.html
 ├── log/
 │   └── fraud_log.json
-├── outputs/
-├── README.md
 ├── requirements.txt
-├── tests/
-└── venv/
+├── README.md
+└── PROJECT_STRUCTURE.md
 ```

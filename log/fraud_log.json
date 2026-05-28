@@ -1,28 +1,26 @@
 {
     "summary": {
-        "session_duration_seconds": 77.38,
+        "session_duration_seconds": 24.54,
         "total_events": 2,
         "event_counts": {
-            "MULTIPLE FACES DETECTED": 1,
-            "CANDIDATE ABSENT": 1
+            "MULTIPLE FACES DETECTED": 2
         },
         "total_durations": {
-            "MULTIPLE FACES DETECTED": 4.69,
-            "CANDIDATE ABSENT": 7.1
+            "MULTIPLE FACES DETECTED": 7.96
         }
     },
     "events": [
         {
             "event": "MULTIPLE FACES DETECTED",
-            "start_time": 3.4,
-            "end_time": 8.09,
-            "duration": 4.69
+            "start_time": 2.01,
+            "end_time": 6.06,
+            "duration": 4.05
         },
         {
-            "event": "CANDIDATE ABSENT",
-            "start_time": 62.84,
-            "end_time": 69.94,
-            "duration": 7.1
+            "event": "MULTIPLE FACES DETECTED",
+            "start_time": 20.63,
+            "end_time": 24.54,
+            "duration": 3.91
         }
     ]
 }

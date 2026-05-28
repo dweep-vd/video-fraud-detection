@@ -2,194 +2,137 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fraud Detection System</title>
     <style>
-        * {
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a2e;
-            color: #e0e0e0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
+        .container {
+            width: 800px;
+            margin: 30px auto;
         }
-
         h1 {
-            color: #00d4ff;
-            font-size: 2.2em;
-            margin-bottom: 10px;
+            font-size: 22px;
+            color: #333;
+            border-bottom: 2px solid #336699;
+            padding-bottom: 8px;
+            margin-bottom: 5px;
         }
-
         .subtitle {
-            color: #a0a0a0;
-            font-size: 1.1em;
-            margin-bottom: 40px;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 25px;
         }
-
-        .cards-container {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 900px;
-            width: 100%;
-        }
-
-        .card {
-            background-color: #16213e;
-            border: 1px solid #0f3460;
-            border-radius: 12px;
-            padding: 30px;
-            flex: 1;
-            min-width: 300px;
-            max-width: 400px;
-        }
-
-        .card h2 {
-            color: #00d4ff;
-            font-size: 1.4em;
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            color: #a0a0a0;
-            font-size: 0.95em;
+        .running-banner {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px 15px;
             margin-bottom: 20px;
-            line-height: 1.5;
+            font-size: 13px;
         }
-
+        .running-banner a {
+            color: #0056b3;
+        }
+        .cards {
+            display: flex;
+            gap: 20px;
+        }
+        .card {
+            flex: 1;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        .card h2 {
+            font-size: 16px;
+            color: #336699;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .card p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
         .btn {
             display: inline-block;
-            padding: 12px 28px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 8px 16px;
+            font-size: 13px;
+            border: 1px solid #aaa;
+            background-color: #e9e9e9;
+            color: #333;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.2s;
         }
-
+        .btn:hover {
+            background-color: #ddd;
+        }
         .btn-primary {
-            background-color: #00d4ff;
-            color: #1a1a2e;
+            background-color: #336699;
+            color: #fff;
+            border-color: #2a5580;
         }
-
         .btn-primary:hover {
-            background-color: #00b8d9;
+            background-color: #2a5580;
         }
-
-        .btn-secondary {
-            background-color: #0f3460;
-            color: #e0e0e0;
-        }
-
-        .btn-secondary:hover {
-            background-color: #1a4a7a;
-        }
-
         .btn-green {
-            background-color: #00c853;
-            color: #1a1a2e;
+            background-color: #5cb85c;
+            color: #fff;
+            border-color: #4cae4c;
         }
-
         .btn-green:hover {
-            background-color: #00a844;
+            background-color: #4cae4c;
         }
-
-        .file-input-area {
-            margin-bottom: 15px;
-        }
-
-        .file-input-area input[type="file"] {
+        input[type="file"] {
+            font-size: 12px;
+            margin-bottom: 10px;
             display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #0f3460;
-            border: 1px dashed #00d4ff;
-            border-radius: 8px;
-            color: #e0e0e0;
-            cursor: pointer;
-            font-size: 0.9em;
         }
-
         .uploaded-info {
-            background-color: #0f3460;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 15px;
-            color: #00d4ff;
-            font-size: 0.9em;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
         }
-
-        .uploaded-info span {
-            color: #00c853;
-            font-weight: bold;
-        }
-
         .bottom-section {
-            margin-top: 40px;
+            margin-top: 25px;
             text-align: center;
+            font-size: 13px;
         }
-
         .bottom-section a {
-            color: #00d4ff;
-            text-decoration: none;
-            font-size: 1em;
+            color: #336699;
         }
-
-        .bottom-section a:hover {
-            text-decoration: underline;
-        }
-
-        .running-banner {
-            background-color: #e94560;
-            color: white;
-            padding: 14px 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .or-divider {
-            color: #a0a0a0;
-            text-align: center;
-            margin: 10px 0;
-            font-size: 0.9em;
+        .bottom-section p {
+            color: #999;
         }
     </style>
 </head>
 <body>
 
-    <h1>🛡️ Fraud Detection System</h1>
+<div class="container">
 
-    <p class="subtitle">
-        Select a video source to start fraud detection
-    </p>
+    <h1>Fraud Detection System</h1>
+    <p class="subtitle">Select a video source to start fraud detection</p>
 
     {% if running %}
     <div class="running-banner">
-        ⚡ Detection is currently running!
-        <a href="/running" style="color: white; margin-left: 10px;">
-            View Status →
-        </a>
+        <strong>Detection is currently running!</strong>
+        <a href="/running">View Status &rarr;</a>
     </div>
     {% endif %}
 
-    <div class="cards-container">
+    <div class="cards">
 
-        <!-- WEBCAM CARD -->
         <div class="card">
-            <h2>📷 Use Webcam</h2>
+            <h2>Use Webcam</h2>
             <p>
                 Start live fraud detection using your
                 computer's webcam. The detection window
@@ -204,18 +147,16 @@
             </form>
         </div>
 
-        <!-- VIDEO FILE CARD -->
         <div class="card">
-            <h2>📁 Use Video File</h2>
+            <h2>Use Video File</h2>
             <p>
                 Upload a video file for fraud detection
-                analysis. Supported formats: MP4, AVI,
-                MOV, MKV.
+                analysis. Supported: MP4, AVI, MOV, MKV.
             </p>
 
             {% if uploaded_file %}
             <div class="uploaded-info">
-                ✅ File ready: <span>{{ uploaded_name }}</span>
+                File ready: <strong>{{ uploaded_name }}</strong>
             </div>
             <form action="/start" method="POST">
                 <input type="hidden" name="source_type" value="file">
@@ -227,13 +168,9 @@
             </form>
             {% else %}
             <form action="/upload" method="POST" enctype="multipart/form-data">
-                <div class="file-input-area">
-                    <input type="file" name="video_file"
-                        accept=".mp4,.avi,.mov,.mkv" required>
-                </div>
-                <button type="submit" class="btn btn-secondary">
-                    Upload Video
-                </button>
+                <input type="file" name="video_file"
+                    accept=".mp4,.avi,.mov,.mkv" required>
+                <button type="submit" class="btn">Upload Video</button>
             </form>
             {% endif %}
         </div>
@@ -242,14 +179,13 @@
 
     <div class="bottom-section">
         {% if log_exists %}
-        <a href="/results">📊 View Previous Session Results</a>
+        <a href="/results">View Previous Session Results</a>
         {% else %}
-        <p style="color: #666;">
-            No previous session data found.
-            Run a detection session first.
-        </p>
+        <p>No previous session data found. Run a detection session first.</p>
         {% endif %}
     </div>
+
+</div>
 
 </body>
 </html>

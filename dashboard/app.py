@@ -3,290 +3,160 @@ import os
 import sys
 import subprocess
 import platform
-from flask import Flask, render_template, jsonify
-from flask import request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
 
-# Project root is one level up from dashboard/
-PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))
-)
-
-LOG_FILE_PATH = os.path.join(
-    PROJECT_ROOT, "log", "fraud_log.json"
-)
-
-UPLOAD_FOLDER = os.path.join(
-    PROJECT_ROOT, "data", "uploads"
-)
-
-APP_FOLDER = os.path.join(
-    PROJECT_ROOT, "app"
-)
+# project root is one level up from dashboard/
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOG_FILE_PATH = os.path.join(PROJECT_ROOT, "log", "fraud_log.json")
+UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, "data", "uploads")
+APP_FOLDER = os.path.join(PROJECT_ROOT, "app")
 
 ALLOWED_EXTENSIONS = {"mp4", "avi", "mov", "mkv"}
 
-# Track the running detection process
+# keep track of the running detection subprocess
 detection_process = None
 
 
 def allowed_file(filename):
-
-    return (
-        "." in filename
-        and filename.rsplit(".", 1)[1].lower()
-        in ALLOWED_EXTENSIONS
-    )
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def load_log_data():
-
     if not os.path.exists(LOG_FILE_PATH):
-
         return None
-
-    with open(LOG_FILE_PATH, "r") as file:
-
-        data = json.load(file)
-
-    return data
+    with open(LOG_FILE_PATH, "r") as f:
+        return json.load(f)
 
 
 def is_detection_running():
-
     global detection_process
-
     if detection_process is None:
-
         return False
-
-    # Check if process is still running
-    poll_result = detection_process.poll()
-
-    if poll_result is None:
-
+    # check if process is still alive
+    if detection_process.poll() is None:
         return True
-
     else:
-
         detection_process = None
-
         return False
 
 
-# ---- ROUTES ----
-
+# ---- routes ----
 
 @app.route("/")
 def index():
-
     running = is_detection_running()
-
     log_exists = os.path.exists(LOG_FILE_PATH)
-
-    return render_template(
-        "index.html",
-        running=running,
-        log_exists=log_exists,
-    )
+    return render_template("index.html", running=running, log_exists=log_exists)
 
 
 @app.route("/start", methods=["POST"])
 def start_detection():
-
     global detection_process
 
     if is_detection_running():
-
         return redirect(url_for("running"))
 
-    source_type = request.form.get(
-        "source_type", "webcam"
-    )
-
-    # Build the command to run main.py
+    source_type = request.form.get("source_type", "webcam")
     python_exe = sys.executable
 
     if source_type == "webcam":
-
-        command = [
-            python_exe,
-            "main.py",
-            "webcam",
-        ]
-
+        command = [python_exe, "main.py", "webcam"]
     else:
-
-        video_path = request.form.get(
-            "video_path", ""
-        )
-
-        command = [
-            python_exe,
-            "main.py",
-            "file",
-            video_path,
-        ]
+        video_path = request.form.get("video_path", "")
+        command = [python_exe, "main.py", "file", video_path]
 
     print(f"Starting detection: {command}")
 
-    # On Windows, use CREATE_NEW_CONSOLE so the OpenCV
-    # GUI window (cv2.imshow) can render properly.
     popen_kwargs = {"cwd": APP_FOLDER}
 
-    # Capture stderr to a log file for crash diagnostics
-    error_log_path = os.path.join(
-        PROJECT_ROOT, "log", "detection_error.log"
-    )
-    os.makedirs(
-        os.path.dirname(error_log_path), exist_ok=True
-    )
+    # log stderr for crash diagnostics
+    error_log_path = os.path.join(PROJECT_ROOT, "log", "detection_error.log")
+    os.makedirs(os.path.dirname(error_log_path), exist_ok=True)
     error_log_file = open(error_log_path, "w")
     popen_kwargs["stderr"] = error_log_file
 
     if platform.system() == "Windows":
-        popen_kwargs["creationflags"] = (
-            subprocess.CREATE_NEW_CONSOLE
-        )
+        popen_kwargs["creationflags"] = subprocess.CREATE_NEW_CONSOLE
 
-    detection_process = subprocess.Popen(
-        command,
-        **popen_kwargs,
-    )
-
+    detection_process = subprocess.Popen(command, **popen_kwargs)
     return redirect(url_for("running"))
 
 
 @app.route("/upload", methods=["POST"])
 def upload_video():
-
     if "video_file" not in request.files:
-
         return redirect(url_for("index"))
 
     file = request.files["video_file"]
-
     if file.filename == "":
-
         return redirect(url_for("index"))
 
     if file and allowed_file(file.filename):
-
         filename = secure_filename(file.filename)
-
         if not os.path.exists(UPLOAD_FOLDER):
-
             os.makedirs(UPLOAD_FOLDER)
-
-        filepath = os.path.join(
-            UPLOAD_FOLDER, filename
-        )
-
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
-
         print(f"Video uploaded: {filepath}")
-
-        return render_template(
-            "index.html",
-            running=False,
-            log_exists=os.path.exists(LOG_FILE_PATH),
-            uploaded_file=filepath,
-            uploaded_name=filename,
-        )
+        return render_template("index.html", running=False,
+                               log_exists=os.path.exists(LOG_FILE_PATH),
+                               uploaded_file=filepath, uploaded_name=filename)
 
     return redirect(url_for("index"))
 
 
 @app.route("/running")
 def running():
-
     running = is_detection_running()
-
-    # If process ended, check for crash errors
     error_msg = None
+
     if not running:
-        error_log_path = os.path.join(
-            PROJECT_ROOT, "log", "detection_error.log"
-        )
+        error_log_path = os.path.join(PROJECT_ROOT, "log", "detection_error.log")
         if os.path.exists(error_log_path):
             with open(error_log_path, "r") as f:
                 content = f.read().strip()
             if content:
                 error_msg = content
 
-    return render_template(
-        "running.html",
-        running=running,
-        error_msg=error_msg,
-    )
+    return render_template("running.html", running=running, error_msg=error_msg)
 
 
 @app.route("/results")
 def results():
-
     data = load_log_data()
-
     if data is None:
-
-        return render_template(
-            "results.html",
-            summary=None,
-            events=[],
-        )
+        return render_template("results.html", summary=None, events=[])
 
     summary = data.get("summary", {})
-
     events = data.get("events", [])
-
-    return render_template(
-        "results.html",
-        summary=summary,
-        events=events,
-    )
+    return render_template("results.html", summary=summary, events=events)
 
 
 @app.route("/api/events")
 def api_events():
-
     data = load_log_data()
-
     if data is None:
-
-        return jsonify(
-            {"error": "No log file found."}
-        )
-
+        return jsonify({"error": "No log file found."})
     return jsonify(data)
 
 
 if __name__ == "__main__":
-
     import logging
     import click
 
-    # Suppress all Flask/Werkzeug startup messages
-    # (Debug mode, Serving Flask app, WARNING, etc.)
+    # suppress flask startup spam
     log = logging.getLogger("werkzeug")
     log.setLevel(logging.ERROR)
-
-    def secho(text, **kwargs):
-        pass
-
-    def echo(text, **kwargs):
-        pass
-
-    click.echo = echo
-    click.secho = secho
+    click.echo = lambda text, **kw: None
+    click.secho = lambda text, **kw: None
 
     print("=" * 50)
     print("  Fraud Detection Dashboard")
     print("  Open http://localhost:5000")
     print("=" * 50)
 
-    app.run(
-        debug=False,
-        port=5000,
-    )
+    app.run(debug=False, port=5000)
